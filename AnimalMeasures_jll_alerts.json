@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/planta_schema.json",
+    "title": "AnimalMeasures_jll_alerts",
+    "description": "pruebaaa",
+    "type": "object",
+    "properties": {
+        "timeStamp": {
+            "type": "string"
+        },
+        "animalID": {
+            "description": "field1",
+            "type": "string"
+        },
+        "tempAlert": {
+            "description": "field10",
+            "type": "number"
+        },
+        "stepsAlert": {
+            "description": "field11",
+            "type": "number"
+        },
+        "weightAlert": {
+            "description": "field12",
+            "type": "number"
+        }
+    }
+}
