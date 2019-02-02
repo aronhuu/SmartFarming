@@ -1,0 +1,131 @@
+[{
+	"id": "61f29001.789a6",
+	"type": "tab",
+	"label": "Flow 2",
+	"disabled": false,
+	"info": ""
+}, {
+	"id": "b499ea3b.dfc2c8",
+	"type": "mqtt-broker",
+	"z": "",
+	"name": "",
+	"broker": "138.100.48.251",
+	"port": "1883",
+	"clientid": "",
+	"usetls": false,
+	"compatmode": true,
+	"keepalive": "60",
+	"cleansession": true,
+	"birthTopic": "",
+	"birthQos": "0",
+	"birthPayload": "",
+	"closeTopic": "",
+	"closeQos": "0",
+	"closePayload": "",
+	"willTopic": "",
+	"willQos": "0",
+	"willPayload": ""
+}, {
+	"id": "350aeb3.af73914",
+	"type": "mqtt in",
+	"z": "61f29001.789a6",
+	"name": "",
+	"topic": "dev/animal",
+	"qos": "2",
+	"broker": "b499ea3b.dfc2c8",
+	"x": 120,
+	"y": 120,
+	"wires": [
+		["76340524.cdf4fc"]
+	]
+}, {
+	"id": "76340524.cdf4fc",
+	"type": "function",
+	"z": "61f29001.789a6",
+	"name": "Transformation",
+	"func": "\nvar sensorData = {};\nvar sensorAlert = {};\nvar newMsg = {};\nnewMsg.payload = {};\nvar newMsg2 = {};\nnewMsg2.payload = {};\n\nvar values;\nvar alertTemp = false;\nvar alertSteps = false;\nvar alertWeight = false;\n\n//sensorData.timeStamp = new Date().toISOString();\nsensorAlert.timeStamp = new Date().toISOString();\n\nif (msg.payload) {\n\tvalues = msg.payload.split(\"&\");\n\tif (values) {\n\t\tfor (var index in values) {\n\t\t\tlet value = values[index];\n\t\t\tlet val = value.split(\"=\");\n\t\t\tif (val.length == 2) {\n\t\t\t\tswitch (val[0]) {\n\t\t\t\t\tcase 'field1':\n\t\t\t\t\t\tsensorData.animalID = val[1];\n\t\t\t\t\t\tsensorAlert.animalID = val[1];\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field2':\n\t\t\t\t\t\tsensorData.name = val[1];\n\t\t\t\t\t\t//sensorData.name = 'JULIA';\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field3':\n\t\t\t\t\t\tsensorData.type = val[1];\n\t\t\t\t\t\t//sensorData.type = 'VACA';\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field4':\n\t\t\t\t\t\tsensorData.age = Number(val[1]);\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field5':\n\t\t\t\t\t\tsensorData.animalLatitude = Number(val[1]);\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field6':\n\t\t\t\t\t\tsensorData.animalLongitude = Number(val[1]);\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field7':\n\t\t\t\t\t\tsensorData.bodyTemp = Number(val[1]);\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field8':\n\t\t\t\t\t\tsensorData.steps = Number(val[1]);\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field9':\n\t\t\t\t\t\tsensorData.weight = Number(val[1]);\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field10':\n\t\t\t\t\t    sensorAlert.tempAlert = Number(val[1]);\n\t\t\t\t\t    switch(val[1]){\n\t\t\t\t\t        case '0':\n\t\t\t\t\t            break;\n\t\t\t\t\t        case '1':\n\t\t\t\t\t            alertTemp = true;\n\t\t\t\t\t            break;\n\t\t\t\t\t    }\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field11':\n\t\t\t\t\t\tsensorAlert.stepsAlert = Number(val[1]);\n\t\t\t\t\t\tswitch(val[1]){\n\t\t\t\t\t        case '0':\n\t\t\t\t\t            break;\n\t\t\t\t\t        case '1':\n\t\t\t\t\t            alertSteps = true;\n\t\t\t\t\t            break;\n\t\t\t\t\t    }\n\t\t\t\t\t\tbreak;\n\t\t\t\t\tcase 'field12':\n\t\t\t\t\t\tsensorAlert.weightAlert = Number(val[1]);\n\t\t\t\t\t\tswitch(val[1]){\n\t\t\t\t\t        case '0':\n\t\t\t\t\t            break;\n\t\t\t\t\t        case '1':\n\t\t\t\t\t            alertWeight = true;\n\t\t\t\t\t            break;\n\t\t\t\t\t    }\n\t\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t}\n\n\t\t}\n\t}\n}\nif(!alertTemp && alertSteps && alertWeight){\n    newMsg2.payload.node_data = sensorData;\n    newMsg2.ontology = 'AnimalMeasures_jll';\n    //Output 1\n\treturn [newMsg2, null];\n\t\n}else{\n    newMsg2.payload.node_data = sensorData;\n    newMsg2.ontology = 'AnimalMeasures_jll';\n    newMsg.payload.alert_data = sensorAlert;\n    newMsg.ontology = 'AnimalMeasures_jll_alerts';\n\t//Output 2\n\treturn [newMsg2, newMsg];\n\n}\n",
+	"outputs": 2,
+	"noerr": 0,
+	"x": 300,
+	"y": 100,
+	"wires": [
+		["16e6f30e.a20f9d", "5683b3a3.c0e8dc"],
+		["dce17986.f88728", "89bc7174.4a7f8"]
+	]
+}, {
+	"id": "16e6f30e.a20f9d",
+	"type": "debug",
+	"z": "61f29001.789a6",
+	"name": "",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "payload",
+	"x": 480,
+	"y": 40,
+	"wires": []
+}, {
+	"id": "5683b3a3.c0e8dc",
+	"type": "onesaitplatform-insert",
+	"z": "61f29001.789a6",
+	"name": "Insert Data",
+	"ontology": "AnimalMeasures_jll",
+	"authentication": "SmF2aWVyTGFuZGFldGE6dktWOXJ2R3g2V1pGbjkvV3BwNnQxY2VuTGVyR1g1WFNvVjZuNWl1WTNKYz0=",
+	"x": 490,
+	"y": 100,
+	"wires": [
+		["36d0c3a7.5f0b9c"]
+	]
+}, {
+	"id": "dce17986.f88728",
+	"type": "onesaitplatform-insert",
+	"z": "61f29001.789a6",
+	"name": "Insert Alert",
+	"ontology": "AnimalMeasures_jll_alerts",
+	"authentication": "SmF2aWVyTGFuZGFldGE6dktWOXJ2R3g2V1pGbjkvV3BwNnQxY2VuTGVyR1g1WFNvVjZuNWl1WTNKYz0=",
+	"x": 490,
+	"y": 160,
+	"wires": [
+		["98eed3c3.243da"]
+	]
+}, {
+	"id": "36d0c3a7.5f0b9c",
+	"type": "debug",
+	"z": "61f29001.789a6",
+	"name": "Inserted Data",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "payload",
+	"x": 690,
+	"y": 100,
+	"wires": []
+}, {
+	"id": "98eed3c3.243da",
+	"type": "debug",
+	"z": "61f29001.789a6",
+	"name": "Inserted Alert",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "payload",
+	"x": 680,
+	"y": 160,
+	"wires": []
+}, {
+	"id": "89bc7174.4a7f8",
+	"type": "debug",
+	"z": "61f29001.789a6",
+	"name": "",
+	"active": true,
+	"tosidebar": true,
+	"console": false,
+	"tostatus": false,
+	"complete": "false",
+	"x": 490,
+	"y": 220,
+	"wires": []
+}]
