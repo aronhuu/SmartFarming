@@ -39,6 +39,11 @@
         "weight": {
             "description": "field9",
             "type": "number"
+        },
+        "timeStamp": {
+            "type": "string",
+            "format": "date-time"
         }
-    }
+    },
+    "additionalProperties": true
 }

@@ -52,9 +52,9 @@ char type[10];
 int age;
 float animalLatitude;
 float animalLongitude;
-float bodytemp;
-int steps;
-float weight;
+float bodytemp=0;
+int steps =0;
+float weight=0;
 
 //-----------constantes---------
 //----------IDENTIFICATION------------------
@@ -66,9 +66,10 @@ const int AGE = 84; //meses//field4
 const float LATITUDE = 40.416358;//field5
 const float LONGITUDE = -3.650009;//field6
 //----------AVERAGE MEASURES-----------------
-const float BODYTEMP = 43; //grados centigrados //field7
-const int STEPS = 9000; ////field8
-const float WEIGHT = 400; //Kilos ////field9
+//const float BODYTEMP = 43; //grados centigrados //field7
+//const int STEPS = 9000; ////field8
+//const float WEIGHT = 400; //Kilos ////field9
+
 
 
 // choose socket (SELECT USER'S SOCKET)
@@ -129,7 +130,6 @@ void cleanPayload(){
 
 void sendMessages(){
   if(!WIFI_PRO.isConnected()){
-    USB.print(F("\n\t\tWIFI DESCONECTADA E INTENTADO CONECTAR NUEVAMENTE"));
     while(!configureWiFi()){
       delay(1000);
     }
@@ -281,7 +281,7 @@ void addIntField(unsigned char * payload, int value, int field){
 }
 
 void addStrField(unsigned char * payload, char * value, int field){
-  unsigned char aux[18]={'\0'};
+  unsigned char aux[18]={'\0'};  
   if(strlen((char *)payload)>0){
     snprintf((char *)aux, 18, "&field%d=%s", field, value);
   }else{
@@ -311,30 +311,33 @@ void measure(){
   animalLongitude = LONGITUDE;
   addFloatField(payloadList[0], animalLongitude, 6);
   //----------animal temperature-----------------------
-  bodytemp = BODYTEMP;
+  //bodytemp = BODYTEMP;
+  bodytemp = 1+rand()%(45-15);
   addFloatField(payloadList[0], bodytemp, 7);
   //----------animal steps-----------------------
-  steps = STEPS;
+ // steps = STEPS;
+ steps=1+rand()%(9500-2500);
   addIntField(payloadList[0], steps, 8);
   //----------animal weight-----------------------
-  weight = WEIGHT;
+ // weight = WEIGHT;
+ weight = 1+rand()%(350-900);
   addFloatField(payloadList[0], weight, 9);
 
   //-----------ALERTS----------------------------
   //----------Alerta de temperatura-------------
-  if(bodytemp<20 || bodytemp>40){
+  if(bodytemp<20 || bodytemp>45){
     addIntField(payloadList[0], 1, 10);
   }else{
     addIntField(payloadList[0], 0, 10);
   }
   //----------Alerta de pasos-------------
-  if(steps>8000){
+  if(steps>15000){
     addIntField(payloadList[0], 1, 11);
   }else{
     addIntField(payloadList[0], 0, 11);
   }
   //----------Alerta de peso-------------
-  if(weight<500 && age>36){
+  if((weight/age)<15 || (weight/age)>25){
     addIntField(payloadList[0], 1, 12);
   }else{
     addIntField(payloadList[0], 0, 12);
@@ -370,7 +373,7 @@ void setup()
   USB.print(F("RTC was set to this time: "));
   USB.println(RTC.getTime());
   
-  strncpy(topicList[0], "dev/animal",11);
+  strncpy(topicList[0], "smartFarming/animal",20);
   //strncpy(topicList[1], "g2/channels/666894/publish/J8J79SZWTMYLVK09",44);
   
   while(!configureWiFi()){
