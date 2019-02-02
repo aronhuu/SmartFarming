@@ -12,6 +12,14 @@
             "description": "field1",
             "type": "string"
         },
+        "name": {
+            "description": "field2",
+            "type": "string"
+        },
+        "type": {
+            "description": "field3",
+            "type": "string"
+        },
         "tempAlert": {
             "description": "field10",
             "type": "number"
